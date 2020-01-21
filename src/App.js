@@ -1,5 +1,7 @@
 import React from 'react';
 
+import SnippetContextProvider from './contexts/SnippetContext'
+
 import NavBar from './components/NavBar'
 import FilterMenu from './components/FilterMenu'
 import SnippetListPanel from './components/SnippetListPanel'
@@ -11,12 +13,18 @@ function App() {
   return (
     <div className="App">
       <NavBar />
-      <FilterMenu />
-      <div className='snippet-panel-container'>
-        <SnippetListPanel/>
-        <SnippetViewPanel/>
-      </div>
-      <Footer/>
+
+      <SnippetContextProvider>
+
+        <FilterMenu />
+        <div className='snippet-panel-container'>
+          <SnippetListPanel />
+          <SnippetViewPanel />
+        </div>
+
+      </SnippetContextProvider>
+
+      <Footer />
     </div>
   );
 }

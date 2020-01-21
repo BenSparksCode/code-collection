@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { SnippetContext } from '../contexts/SnippetContext'
 
 const FilterMenu = () => {
+    const { snippetState } = useContext(SnippetContext)
+
     return (
         <div className='filter-menu-container'>
-            Filter Menu
+            Filter Menu:
+            {snippetState.selectedSnippet}
         </div>
     )
 }
