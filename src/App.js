@@ -1,30 +1,45 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 
-import SnippetContextProvider from './contexts/SnippetContext'
+import { AppContext } from './contexts/AppContext'
 
-import NavBar from './components/NavBar'
-import FilterMenu from './components/FilterMenu'
-import SnippetListPanel from './components/SnippetListPanel'
-import SnippetViewPanel from './components/SnippetViewPanel'
-import Footer from './components/Footer'
+import './App.css'
+
+const firebase = require('firebase')
+
+const App = () => {
+
+  const { appState, setNotes } = useContext(AppContext)
+
+  //similar to componentDidMount and componentDidUpdate
+  useEffect(() => {
+    //On component mounting:
+    //Get all notes from firebase   
+    //Store notes in app state (Snippet Context)
+
+    firebase
+      .firestore()
+      .collection('notes')
+      .onSnapshot(serverUpdate => {
+        const notes = serverUpdate.docs.map(doc => {
+          const data = doc.data()
+          data['id'] = doc.id
+          return data
+        })
+        //setting state here
+        //set notes in state to the new notes array mapped here
+        console.log(notes);
+        //Effectively settting notes state but in the App Context
+        setNotes(notes)
+      })
+
+    //NB - the epmty [] tells it to only run when component mounts, not every time it updates
+  }, [])
 
 
-function App() {
+
   return (
     <div className="App">
-      <NavBar />
-
-      <SnippetContextProvider>
-
-        <FilterMenu />
-        <div className='snippet-panel-container'>
-          <SnippetListPanel />
-          <SnippetViewPanel />
-        </div>
-
-      </SnippetContextProvider>
-
-      <Footer />
+      hello
     </div>
   );
 }
