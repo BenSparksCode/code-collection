@@ -1,14 +1,22 @@
-export default function debounce(a, b, c) {
-    var d, e;
-    return function () {
-        function h() {
-            d = null;
-            c || (e = a.apply(f, g));
+import {useState, useEffect} from 'react'
+
+//Debounce Hook - Can be easily reused elsewhere
+export default function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value)
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay)
+
+        return () => {
+            clearTimeout(handler)
         }
-        var f = this, g = arguments;
-        return (clearTimeout(d), d = setTimeout(h, b), c && !d && (e = a.apply(f, g)), e)
-    }
+    }, [value])
+
+    return debouncedValue
 }
+
 
 export function removeHTMLTags(str) {
     return str.replace(/<[^>]*>?/gm, '');
