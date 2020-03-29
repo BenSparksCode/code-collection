@@ -8,11 +8,9 @@ import { removeHTMLTags } from '../../helpers';
 
 
 
-const SidebarItem = () => {
+const SidebarItem = (props) => {
 
-    const [state, setState] = useState({
-
-    })
+    const { _index, _note, classes, selectedNoteIndex } = props
 
     return (
         <div>
