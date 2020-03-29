@@ -15,7 +15,7 @@ const Editor = (props) => {
     const [id, setId] = useState('')
 
     //Debounced Write Text to Firebase
-    const debouncedText = useDebounce(text, 1500)
+    const debouncedText = useDebounce(text, 60000)
 
     //Listen for changes in Debounced Text before writing to Firebase
     useEffect(() => {

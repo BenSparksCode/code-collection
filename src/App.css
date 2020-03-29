@@ -6,7 +6,7 @@ html, body {
     padding: 0;
     overflow: hidden;
   }
-  #evernote-container {
+  #code-collection-container {
     height: 100%;
     box-sizing: border-box;
   }

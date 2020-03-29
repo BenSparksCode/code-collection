@@ -29,7 +29,7 @@ ReactDOM.render(
 (<AppContextProvider>
     <App />
 </AppContextProvider>)
-, document.getElementById('root'));
+, document.getElementById('code-collection-container'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
