@@ -10,9 +10,9 @@ import { AppContext } from '../../contexts/AppContext'
 
 const Sidebar = (props) => {
 
-    const { selectNote } = useContext(AppContext)
+    const { appState, newNote } = useContext(AppContext)
 
-    const { notes, classes, selectedNoteIndex } = props
+    const { classes } = props
 
     const [addingNote, setAddingNote] = useState(false)
     const [title, setTitle] = useState(null)
@@ -25,12 +25,12 @@ const Sidebar = (props) => {
         setTitle(t)
     }
 
-    const newNote = () => {
-
+    const addNewNote = () => {
+        newNote(title)
+        setAddingNote(false)
     }
 
-
-    if (notes) {
+    if (appState.notes) {
         return (
             <div className={classes.sidebarContainer}>
                 <Button
@@ -52,19 +52,19 @@ const Sidebar = (props) => {
                                 </input>
                                 <Button
                                     className={classes.newNoteSubmitBtn}
-                                    onClick={newNote}>Submit Note</Button>
+                                    onClick={addNewNote}>Submit Note</Button>
                             </div>
                         ) : null
                 }
                 <List>
                     {
-                        notes.map((_note, _index) => {
+                        appState.notes.map((_note, _index) => {
                             return (
                                 <div className='' key={_index}>
                                     <SidebarItem
                                         _note={_note}
                                         _index={_index}
-                                        selectedNoteIndex={selectedNoteIndex} />
+                                        selectedNoteIndex={appState.selectedNoteIndex} />
                                     <Divider></Divider>
                                 </div>
                             )

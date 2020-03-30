@@ -17,13 +17,15 @@ const Editor = (props) => {
     const [text, setText] = useState('')
     const [title, setTitle] = useState('')
     const [id, setId] = useState('')
+    //typing check to avoid DB updates on opening the notes
+    const [isTyping, setIsTyping] = useState(false)
 
     //Debounced Write Text to Firebase
     const debouncedText = useDebounce(text, 2000)
 
     //Listen for changes in Debounced Text before writing to Firebase
     useEffect(() => {
-        if(text){
+        if(text && isTyping){
             //DB UPDATE called here
             noteUpdate(id, {
                 title: title,
@@ -35,7 +37,8 @@ const Editor = (props) => {
 
     //In place of componentDidMount
     useEffect(() => {
-        if(appState.selectedNoteIndex !== null){
+        if(appState.selectedNoteIndex >= 0){
+            console.log(appState);
             setText(appState.selectedNote.body)
             setId(appState.selectedNote.id)
             setTitle(appState.selectedNote.title)
@@ -45,7 +48,7 @@ const Editor = (props) => {
 
     //In place of componentDidUpdate
     useEffect(() => {
-        if(appState.selectedNoteIndex !== null){
+        if(appState.selectedNoteIndex >= 0){
             setText(appState.selectedNote.body)
             setId(appState.selectedNote.id)
             setTitle(appState.selectedNote.title)
@@ -54,9 +57,15 @@ const Editor = (props) => {
     }, [appState.selectedNoteIndex])
 
 
-    const updateBody = async (val) => {
-        await setText(val)
+    const updateBody = (val) => {
+        setText(val)
+        
         console.log(val);
+    }
+
+    //Solves notes updating DB after being opened but no typing
+    const keysTyped = (e) => {
+        setIsTyping(true)
     }
 
     return (
@@ -64,6 +73,7 @@ const Editor = (props) => {
             <ReactQuill
                 value={text}
                 onChange={updateBody}
+                onKeyUp={keysTyped}
                 >
             </ReactQuill>
         </div>
