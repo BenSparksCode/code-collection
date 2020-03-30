@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import styles from './styles';
 import List from '@material-ui/core/List';
 import { Divider, Button } from '@material-ui/core';
 import SidebarItem from '../sidebarItem/SidebarItem';
 
+import { AppContext } from '../../contexts/AppContext'
+
 
 const Sidebar = (props) => {
+
+    const { selectNote } = useContext(AppContext)
 
     const { notes, classes, selectedNoteIndex } = props
 
@@ -23,14 +27,6 @@ const Sidebar = (props) => {
 
     const newNote = () => {
 
-    }
-
-    const selectNote = () => {
-        console.log("select note");
-    }
-
-    const deleteNote = () => {
-        console.log("delete note");
     }
 
 
@@ -68,9 +64,7 @@ const Sidebar = (props) => {
                                     <SidebarItem
                                         _note={_note}
                                         _index={_index}
-                                        selectedNoteIndex={selectedNoteIndex}
-                                        selectNote={selectNote}
-                                        deleteNote={deleteNote} />
+                                        selectedNoteIndex={selectedNoteIndex} />
                                     <Divider></Divider>
                                 </div>
                             )

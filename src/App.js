@@ -28,9 +28,6 @@ const App = () => {
           data['id'] = doc.id
           return data
         })
-        //setting state here
-        //set notes in state to the new notes array mapped here
-        console.log(notes);
         //Effectively settting notes state but in the App Context
         setNotes(notes)
       })
@@ -39,14 +36,21 @@ const App = () => {
   }, [])
 
 
-
   return (
     <div className="app-container">
       <Sidebar
         selectedNoteIndex={appState.selectedNoteIndex}
         notes={appState.notes}
       />
-      <Editor />
+      {
+        appState.selectedNoteIndex !== null ?
+          (
+            <Editor />
+          ) : (
+            <div></div>
+          )
+      }
+
     </div>
   );
 }
