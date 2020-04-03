@@ -8,7 +8,7 @@ import './App.css'
 
 const App = () => {
 
-  const { appState } = useContext(AppContext)
+  const { selectedNoteIndex } = useContext(AppContext)
 
 
   
@@ -18,7 +18,7 @@ const App = () => {
     <div className="app-container">
       <Sidebar />
       {
-        appState.selectedNoteIndex !== null ?
+        selectedNoteIndex !== null ?
           (
             <Editor />
           ) : (

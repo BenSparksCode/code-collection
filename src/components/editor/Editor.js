@@ -9,7 +9,7 @@ import { AppContext } from '../../contexts/AppContext'
 
 const Editor = (props) => {
 
-    const { appState, noteUpdate } = useContext(AppContext)
+    const {  selectedNote, selectedNoteIndex, noteUpdate } = useContext(AppContext)
 
     const { classes } = props
 
@@ -21,60 +21,93 @@ const Editor = (props) => {
     const [isTyping, setIsTyping] = useState(false)
 
     //Debounced Write Text to Firebase
-    const debouncedText = useDebounce(text, 2000)
+    const debouncedBody = useDebounce(text, 2000)
+    const debouncedTitle = useDebounce(title, 2000)
 
+    //Title
     //Listen for changes in Debounced Text before writing to Firebase
     useEffect(() => {
-        if(text && isTyping){
+        if (title && isTyping) {
             //DB UPDATE called here
             noteUpdate(id, {
                 title: title,
                 body: text
             })
-            console.log("Updating DB");
+            console.log("Updating title in DB");
+            setIsTyping(false)
         }
-    }, [debouncedText])
+    }, [debouncedTitle])
+
+    //BODY
+    //Listen for changes in Debounced Text before writing to Firebase
+    useEffect(() => {
+        if (text && isTyping) {
+            //DB UPDATE called here
+            noteUpdate(id, {
+                title: title,
+                body: text
+            })
+            console.log("Updating body in DB");
+            setIsTyping(false)
+        }
+    }, [debouncedBody])
 
     //In place of componentDidMount
     useEffect(() => {
-        if(appState.selectedNoteIndex >= 0){
-            console.log(appState);
-            setText(appState.selectedNote.body)
-            setId(appState.selectedNote.id)
-            setTitle(appState.selectedNote.title)
+        if (selectedNoteIndex >= 0) {
+
+            setText(selectedNote.body)
+            setId(selectedNote.id)
+            setTitle(selectedNote.title)
         }
         //empty [] to immitate componentDidMount
     }, [])
 
     //In place of componentDidUpdate
     useEffect(() => {
-        if(appState.selectedNoteIndex >= 0){
-            setText(appState.selectedNote.body)
-            setId(appState.selectedNote.id)
-            setTitle(appState.selectedNote.title)
+        if (selectedNoteIndex >= 0) {
+            setText(selectedNote.body)
+            setId(selectedNote.id)
+            setTitle(selectedNote.title)
         }
         //Runs on this var changed
-    }, [appState.selectedNoteIndex])
+    }, [selectedNoteIndex])
 
 
     const updateBody = (val) => {
         setText(val)
-        
-        console.log(val);
+    }
+
+    const updateTitle = (val) => {
+        setTitle(val)
     }
 
     //Solves notes updating DB after being opened but no typing
     const keysTyped = (e) => {
         setIsTyping(true)
     }
+    
 
     return (
         <div className={classes.editorContainer}>
+
+            <BorderColorIcon className={classes.editIcon}></BorderColorIcon>
+
+            <input
+                className={classes.titleInput}
+                type="text"
+                placeholder='Note title...'
+                value={title ? title : ''}
+                onChange={(e) => updateTitle(e.target.value)}
+                onKeyUp={keysTyped}>
+
+            </input>
+
             <ReactQuill
                 value={text}
                 onChange={updateBody}
                 onKeyUp={keysTyped}
-                >
+            >
             </ReactQuill>
         </div>
     )

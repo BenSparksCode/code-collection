@@ -1,30 +1,33 @@
-import React, { createContext, useState, useEffect, useRef } from 'react'
+import React, { Component, createContext, useState, useEffect, useRef } from 'react'
 
 const firebase = require('firebase')
 
 export const AppContext = createContext()
 
-const initialState = {
-    selectedNoteIndex: null,
-    selectedNote: null,
-    notes: null,
-}
+// const initialState = {
+//     selectedNoteIndex: null,
+//     selectedNote: null,
+//     notes: null,
+// }
 
-const AppContextProvider = (props) => {
+class AppContextProvider extends Component {
 
-    const [appState, setAppState] = useState(initialState)
+    state = {
+        selectedNoteIndex: null,
+        selectedNote: null,
+        notes: null,
+    }
 
     //Needed to keep track of note selected for when DB updates cause a rerender
     //And useEffect doesn't have access to current appState
-    const selectedNoteRef = useRef(null)
-    const selectedNoteIndexRef = useRef(null)
+    // const selectedNoteRef = useRef(null)
+    // const selectedNoteIndexRef = useRef(null)
 
-    //Helper Ref to handle creating new notes and adding to state
-    const newNoteRef = useRef(null)
+    // //Helper Ref to handle creating new notes and adding to state
+    // const newNoteRef = useRef(null)
 
 
-    //similar to componentDidMount and componentDidUpdate
-    useEffect(() => {
+    componentDidMount() {
         //On component mounting:
         //Get all notes from firebase   
         //Store notes in app state (Snippet Context)
@@ -41,61 +44,86 @@ const AppContextProvider = (props) => {
 
                 console.log("Recieved new Firebase data");
                 //Effectively settting notes state but in the App Context
-                setNotes(notes)
+                this.setNotes(notes)
             })
+    }
 
-        //NB - the empty [] tells it to only run when component mounts, not every time it updates
-    }, [])
+    // //similar to componentDidMount and componentDidUpdate
+    // useEffect(() => {
 
 
-    const setNotes = (n) => {
-        setAppState({
-            ...appState, ...{
-                notes: n,
-                selectedNoteIndex: selectedNoteIndexRef.current,
-                selectedNote: selectedNoteRef.current,
-            }
+    //     //NB - the empty [] tells it to only run when component mounts, not every time it updates
+    // }, [])
+
+
+    setNotes = (n) => {
+
+        this.setState({
+            notes: n
+        })
+
+        // setAppState({
+        //     ...appState, ...{
+        //         notes: n,
+        //         selectedNoteIndex: selectedNoteIndexRef.current,
+        //         selectedNote: selectedNoteRef.current,
+        //     }
+        // })
+    }
+
+
+    selectNote = (n, i) => {
+        // selectedNoteIndexRef.current = i
+        // selectedNoteRef.current = n
+        // setAppState({ ...appState, ...{ selectedNoteIndex: i, selectedNote: n } })
+
+        this.setState({
+            selectedNoteIndex: i,
+            selectedNote: n
         })
     }
 
 
-    const selectNote = (n, i) => {
-        selectedNoteIndexRef.current = i
-        selectedNoteRef.current = n
-        setAppState({ ...appState, ...{ selectedNoteIndex: i, selectedNote: n } })
-    }
-
-
-    const deleteNote = (note) => {
+    deleteNote = (note) => {
         //Getting index of deleted note in array
-        const noteIndex = appState.notes.indexOf(note)
+        const noteIndex = this.state.notes.indexOf(note)
 
         //Adjusting selected notes and indices for when note is removed
-        if (appState.selectedNoteIndex === noteIndex) {
+        if (this.state.selectedNoteIndex === noteIndex) {
             //Changing selected note to null if selected note is deleted
             //So no note is open in editor after being deleted
-            selectedNoteIndexRef.current = null
-            selectedNoteRef.current = null
 
-            setAppState({
-                ...appState, ...{
-                    selectedNoteIndex: null,
-                    selectedNote: null
-                }
+
+            // selectedNoteIndexRef.current = null
+            // selectedNoteRef.current = null
+            // setAppState({
+            //     ...appState, ...{
+            //         selectedNoteIndex: null,
+            //         selectedNote: null
+            //     }
+            // })
+
+            this.setState({
+                selectedNoteIndex: null,
+                selectedNote: null
             })
         } else {
-            if (appState.notes.length > 1) {
+            if (this.state.notes.length > 1) {
                 //if many notes - set focus to note before the one deleted 
-                selectNote(appState.notes[appState.selectedNoteIndex - 1], appState.selectedNoteIndex - 1)
+                this.selectNote(this.state.notes[this.state.selectedNoteIndex - 1], this.state.selectedNoteIndex - 1)
             } else {
-                selectedNoteIndexRef.current = null
-                selectedNoteRef.current = null
+                // selectedNoteIndexRef.current = null
+                // selectedNoteRef.current = null
+                // setAppState({
+                //     ...appState, ...{
+                //         selectedNoteIndex: null,
+                //         selectedNote: null
+                //     }
+                // })
 
-                setAppState({
-                    ...appState, ...{
-                        selectedNoteIndex: null,
-                        selectedNote: null
-                    }
+                this.setState({
+                    selectedNoteIndex: null,
+                    selectedNote: null
                 })
             }
         }
@@ -109,10 +137,8 @@ const AppContextProvider = (props) => {
     }
 
     //TODO: Fix add note behaviour 
-    const newNote = async (title) => {
-        console.log(appState);
+    newNote = async (title) => {
 
-        console.log("new note context fn");
         let note = {
             title: title,
             body: ""
@@ -136,57 +162,37 @@ const AppContextProvider = (props) => {
 
         console.log(note);
 
-        newNoteRef.current = note
+        // newNoteRef.current = note
 
-        console.log(newNoteRef.current);
+        // await setAppState({ ...appState, ...{ notes: [note, ...appState.notes] } })
 
-        await setAppState({ ...appState, ...{ notes: [note, ...appState.notes] } })
+        await this.setState({
+            notes: [...this.state.notes, note]
+        })
 
-        const newNoteIndex = appState.notes.indexOf(appState.notes.filter(_note => _note.id === note.id)[0])
+        const newNoteIndex = this.state.notes.indexOf(this.state.notes.filter(_note => _note.id === note.id)[0])
 
         //Updating Ref vars to point to new note as well
-        selectedNoteIndexRef.current = newNoteIndex
-        selectedNoteRef.current = appState.notes[newNoteIndex]
+        // selectedNoteIndexRef.current = newNoteIndex
+        // selectedNoteRef.current = appState.notes[newNoteIndex]
+        // setAppState({
+        //     ...appState, ...{
+        //         selectedNote: appState.notes[newNoteIndex],
+        //         selectedNoteIndex: newNoteIndex
+        //     }
+        // })
 
-        setAppState({
-            ...appState, ...{
-                selectedNote: appState.notes[newNoteIndex],
-                selectedNoteIndex: newNoteIndex
-            }
+        this.setState({
+            selectedNote: this.state.notes[newNoteIndex],
+            selectedNoteIndex: newNoteIndex
         })
 
 
-        console.log(appState);
+        console.log(this.state);
     }
 
-    // useEffect(() => {
-    //     console.log("USE EFFECT REF WORKED", newNoteRef.current);
 
-    //     const note = newNoteRef.current
-
-    //     console.log(appState);
-
-    //     setAppState({...appState, ...{test:1}})
-    //     console.log(appState);
-
-
-    //     // setAppState({...appState, ...{notes: [note, ...appState.notes]}})
-
-    //     // const newNoteIndex = appState.notes.indexOf(appState.notes.filter(_note => _note.id === note.id)[0])
-
-    //     // //Updating Ref vars to point to new note as well
-    //     // selectedNoteIndexRef.current = newNoteIndex
-    //     // selectedNoteRef.current = appState.notes[newNoteIndex]
-
-    //     // setAppState({...appState, ...{
-    //     //     selectedNote: appState.notes[newNoteIndex],
-    //     //     selectedNoteIndex: newNoteIndex
-    //     // }})
-
-    // }, [newNoteRef.current])
-
-    
-    const noteUpdate = (id, noteObj) => {
+    noteUpdate = (id, noteObj) => {
 
         console.log(id, noteObj)
 
@@ -201,12 +207,22 @@ const AppContextProvider = (props) => {
             })
     }
 
+    render(){
+        return(
+            <AppContext.Provider value = {{
+                ...this.state,
+                setNotes: this.setNotes,
+                selectNote: this.selectNote,
+                deleteNote: this.deleteNote,
+                newNote: this.newNote,
+                noteUpdate: this.noteUpdate
+                }}>
+                { this.props.children }
+            </AppContext.Provider >
+        )
+    }
 
-    return (
-        <AppContext.Provider value={{ appState, setNotes, selectNote, deleteNote, newNote, noteUpdate }}>
-            {props.children}
-        </AppContext.Provider>
-    )
+    
 }
 
 export default AppContextProvider
