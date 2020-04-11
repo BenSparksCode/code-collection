@@ -1,14 +1,8 @@
-import React, { Component, createContext, useState, useEffect, useRef } from 'react'
+import React, { Component, createContext } from 'react'
 
 const firebase = require('firebase')
 
 export const AppContext = createContext()
-
-// const initialState = {
-//     selectedNoteIndex: null,
-//     selectedNote: null,
-//     notes: null,
-// }
 
 class AppContextProvider extends Component {
 
@@ -17,15 +11,6 @@ class AppContextProvider extends Component {
         selectedNote: null,
         notes: null,
     }
-
-    //Needed to keep track of note selected for when DB updates cause a rerender
-    //And useEffect doesn't have access to current appState
-    // const selectedNoteRef = useRef(null)
-    // const selectedNoteIndexRef = useRef(null)
-
-    // //Helper Ref to handle creating new notes and adding to state
-    // const newNoteRef = useRef(null)
-
 
     componentDidMount() {
         //On component mounting:
@@ -48,35 +33,14 @@ class AppContextProvider extends Component {
             })
     }
 
-    // //similar to componentDidMount and componentDidUpdate
-    // useEffect(() => {
-
-
-    //     //NB - the empty [] tells it to only run when component mounts, not every time it updates
-    // }, [])
-
-
     setNotes = (n) => {
-
         this.setState({
             notes: n
         })
-
-        // setAppState({
-        //     ...appState, ...{
-        //         notes: n,
-        //         selectedNoteIndex: selectedNoteIndexRef.current,
-        //         selectedNote: selectedNoteRef.current,
-        //     }
-        // })
     }
 
 
     selectNote = (n, i) => {
-        // selectedNoteIndexRef.current = i
-        // selectedNoteRef.current = n
-        // setAppState({ ...appState, ...{ selectedNoteIndex: i, selectedNote: n } })
-
         this.setState({
             selectedNoteIndex: i,
             selectedNote: n
@@ -93,33 +57,16 @@ class AppContextProvider extends Component {
             //Changing selected note to null if selected note is deleted
             //So no note is open in editor after being deleted
 
-
-            // selectedNoteIndexRef.current = null
-            // selectedNoteRef.current = null
-            // setAppState({
-            //     ...appState, ...{
-            //         selectedNoteIndex: null,
-            //         selectedNote: null
-            //     }
-            // })
-
             this.setState({
                 selectedNoteIndex: null,
                 selectedNote: null
             })
+
         } else {
             if (this.state.notes.length > 1) {
                 //if many notes - set focus to note before the one deleted 
                 this.selectNote(this.state.notes[this.state.selectedNoteIndex - 1], this.state.selectedNoteIndex - 1)
             } else {
-                // selectedNoteIndexRef.current = null
-                // selectedNoteRef.current = null
-                // setAppState({
-                //     ...appState, ...{
-                //         selectedNoteIndex: null,
-                //         selectedNote: null
-                //     }
-                // })
 
                 this.setState({
                     selectedNoteIndex: null,
@@ -162,31 +109,16 @@ class AppContextProvider extends Component {
 
         console.log(note);
 
-        // newNoteRef.current = note
-
-        // await setAppState({ ...appState, ...{ notes: [note, ...appState.notes] } })
-
         await this.setState({
             notes: [...this.state.notes, note]
         })
 
         const newNoteIndex = this.state.notes.indexOf(this.state.notes.filter(_note => _note.id === note.id)[0])
 
-        //Updating Ref vars to point to new note as well
-        // selectedNoteIndexRef.current = newNoteIndex
-        // selectedNoteRef.current = appState.notes[newNoteIndex]
-        // setAppState({
-        //     ...appState, ...{
-        //         selectedNote: appState.notes[newNoteIndex],
-        //         selectedNoteIndex: newNoteIndex
-        //     }
-        // })
-
         this.setState({
             selectedNote: this.state.notes[newNoteIndex],
             selectedNoteIndex: newNoteIndex
         })
-
 
         console.log(this.state);
     }
