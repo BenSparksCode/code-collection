@@ -194,8 +194,6 @@ class AppContextProvider extends Component {
 
     noteUpdate = (id, noteObj) => {
 
-        console.log(id, noteObj)
-
         firebase
             .firestore()
             .collection('notes')
